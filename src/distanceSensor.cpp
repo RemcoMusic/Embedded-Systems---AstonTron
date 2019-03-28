@@ -2,21 +2,21 @@
 #include "distanceSensor.h"
 
 
-void DistanceSensor::beginSensor()
+void DistanceSensor::beginSetup()
 {
-    distanceSensor.init();
     distanceSensor.setSignalRateLimit(SignalRate);
     distanceSensor.setTimeout(500);
     distanceSensor.setMeasurementTimingBudget(200000);
+    distanceSensor.init();
 }
 
 int DistanceSensor::readDistanceSensor()
 {
     int CurrentDistance = distanceSensor.readRangeSingleMillimeters(); 
   
-    if(CurrentDistance <= 1000) //If distance larger that 1m send 9999
+    if(CurrentDistance <= 1000)
     {
-       return CurrentDistance;  
+       return CurrentDistance;
     }
 }
 

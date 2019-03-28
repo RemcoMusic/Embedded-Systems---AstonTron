@@ -4,7 +4,7 @@
 class DistanceSensor
 {
     public:
-        void beginSensor();
+        void beginSetup();
         int readDistanceSensor();
         int detectObjects();
 

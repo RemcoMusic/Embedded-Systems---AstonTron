@@ -6,8 +6,6 @@
 const char* ssid = "Astontron";
 const char* password = "Secret123";
 
-TwoWire I2CdistanceSensor = TwoWire(0);
-
 void connectWifi(){
 
  WiFi.mode(WIFI_STA);
@@ -23,7 +21,6 @@ void connectWifi(){
 void setup() {
   Serial.begin(115200);
   Serial.println("Booting");
-  I2CdistanceSensor.begin(27,32,100000);
   connectWifi();
   disableCore0WDT();
   Tasks initTasks; 

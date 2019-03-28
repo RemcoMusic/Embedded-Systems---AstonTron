@@ -3,6 +3,8 @@
 class Motor
 {
     public:
+        int minSpeed = 590;
+
         Motor()
         {
             pinMode(22, OUTPUT); //IN1
@@ -21,8 +23,8 @@ class Motor
             ledcAttachPin(26,3); //IN4
         }
 
-        void Forward();
+        void directMotors(int targetLocation, bool objectDetected);
+        void SetMotorSpeed(int speedL, int speedR);
         void Stop();
-        void Left();
-        void Right();
+
 };

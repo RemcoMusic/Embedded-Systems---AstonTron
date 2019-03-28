@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include <ESPmDNS.h>
+#include <Wire.h>
 #include "RemoteDebug.h" 
 #include "OTA.h"
 #include "motor.h"
+#include "camera.h"
 #include "distanceSensor.h"
 #include "tasks.h"
 
@@ -10,10 +12,12 @@ RemoteDebug Debug;
 OTA OTAUpdate;
 Motor motor;
 DistanceSensor dSensor;
+Camera openMV;
 
-int objectDetected;
-bool motorEnabled = false;
-TaskHandle_t xHandle = NULL;
+TwoWire I2CdistanceSensor = TwoWire(0);
+
+bool objectDetected = false;
+bool start = false;
 
 void processCmdRemoteDebug() {
 
@@ -25,32 +29,18 @@ void processCmdRemoteDebug() {
   }
 
 	if (lastCmd == "test") {
-      debugI("test suceeded");
+      debugI("Test succeeded /n ESP32 is working correctly");
   }
 
   	if (lastCmd == "start") {
-      debugI("Starting driving");
-      motorEnabled = true;     
+      debugI("Starting driving"); 
+      start = true;
   }
   if (lastCmd == "stop") {
       debugI("Stop gaat fout kut");
-      motorEnabled = false;
+      start = false;
       motor.Stop();     
-  }
-  if (lastCmd == "sensor") {
-      debugI("sensor");
-      dSensor.beginSensor();
-
-      for(int x = 0; x < 10; x++)
-      {
-      debugI("Sensor value:"); 
-      debugI("* Distance: %u mm", dSensor.readDistanceSensor());
-      delay(500);
-      }
-
-      //vTaskDelete(xHandle);
-    
-  }
+  }  
 }
 
 Tasks::Tasks()
@@ -62,68 +52,42 @@ Tasks::Tasks()
     NULL,
     1,
     NULL);
-
-  xTaskCreate(
-    motorDriver,
-    "Motor",
-    10000,
-    NULL,
-    2,
-    &xHandle);
-
-  xTaskCreate(
-    readDistanceSensor,
-    "Read_Distance_Sensor",
-    10000,
-    NULL,
-    1,
-    NULL);
 }
 
 void Tasks::readDistanceSensor(void * parameter)
 {
-  dSensor.beginSensor();
+  I2CdistanceSensor.begin(27,32,100000);
+  dSensor.beginSetup();
   for(;;)
   {
     int distance = dSensor.readDistanceSensor();
-    debugI("* Distance: %u mm", dSensor.readDistanceSensor());
-    if(distance < 100)
+    //debugI("Distance %u mm", distance);
+    //Serial.println(distance);
+    if(distance < 150)
     {
       objectDetected = true;
+      debugI("Object Detected");
     }
-    //objectDetected = dSensor.detectObjects();
-    delay(200);
+    else {
+      objectDetected = false;
+    }
+    delay(50);
+  }
+}
+void Tasks::cameraInput(void * parameter) {
+  openMV.beginSetup();
+  for(;;) {
+    openMV.readCamera();
   }
 }
 
-
-void Tasks::motorDriver(void * parameter)
-{
-  bool driving = false;
-  for(;;)
-  {
-    if(motorEnabled)
-    {
-      if(objectDetected == 0 && driving == false) {
-        motor.Forward();
-        driving = true;
-      } 
-      else if (objectDetected == 1) {
-        debugI("Object detected");
-        motor.Stop();
-        delay(2000);
-        motor.Right();
-        objectDetected = false;
-        delay(2000);
-      }
-    }
-    delay(100);
+void Tasks::motorDriver(void * parameter) {
+  for(;;) {
+    motor.directMotors(openMV.getObjectLocation(), objectDetected);
   }
 }
 
-void Tasks::remoteDebugger(void * parameter)
-{
-
+void Tasks::remoteDebugger(void * parameter) {
     if (MDNS.begin("AstontronDebug")) {
         Serial.print("* MDNS responder started. Hostname -> ");
         Serial.println("AstontronDebug");
@@ -136,7 +100,31 @@ void Tasks::remoteDebugger(void * parameter)
 	  Debug.showProfiler(false); // Profiler (Good to measure times, to optimize codes)
 	  Debug.showColors(true); // Colors
     Debug.setCallBackProjectCmds(&processCmdRemoteDebug);
-  
+
+    xTaskCreate(
+      readDistanceSensor,
+      "Read_Distance_Sensor",
+      10000,
+      NULL,
+      1,
+      NULL);
+
+    xTaskCreate(
+      cameraInput,
+      "Camera_Input",
+      10000,
+      NULL,
+      1,
+      NULL);
+    
+    xTaskCreate(
+      motorDriver,
+      "Motor",
+      10000,
+      NULL,
+      1,
+      NULL);
+
     for(;;)
     {
       Debug.handle();   
