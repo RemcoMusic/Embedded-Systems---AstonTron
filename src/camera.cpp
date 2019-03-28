@@ -27,10 +27,10 @@ void Camera::readCamera()
             cmdIndex = 0;
             
             if(cmd != 0) {
-                mySerial.write('Yes \n');
+                mySerial.write('Yes' + '\n');
             }
             int i = atoi(cmd);
-            Serial.println(i);
+            Serial.println(i); //print camera output
             setObjectLocation(i);
         }else{
             if(cmdIndex++ >= MAX_CMD_LENGTH){

@@ -4,25 +4,43 @@
 
 void Motor::directMotors(int targetLocation, bool objectDetected) {
 
-    int speedL = map(targetLocation ,-176, 0, 0, 100);
-    int speedR = map(targetLocation ,0, 176, 0, 100);
+    int speedR = map(targetLocation ,-176, 176, minSpeedR, maxSpeed);
+    int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeedL);
 
-    Serial.print("Location: ");
-    Serial.println(targetLocation);
-    Serial.print("SpeedL: ");
-    Serial.println(speedL);
-    Serial.print("SpeedR: ");
-    Serial.println(speedR);
-
-    if(targetLocation != 9999 || objectDetected == false)
+    if(speedR < 40 && speedR > -40)
     {
-        //SetMotorSpeed(speedL, speedR);
+        speedR = (maxSpeed - minSpeedR)/2 + minSpeedR; 
     }
-    else
+    if(speedL < 40 && speedL > -40)
     {
-        Stop();
+        speedL = (maxSpeed - minSpeedL)/2 + minSpeedL; 
     }
 
+    // Serial.print("Location: ");
+    // Serial.println(targetLocation);
+    // Serial.print("SpeedL: ");
+    // Serial.println(speedL);
+    // Serial.print("SpeedR: ");
+    // Serial.println(speedR);
+
+    if(targetLocation != 9999 && targetLocation != 0 && !objectDetected)
+    {
+        SetMotorSpeed(speedL, speedR);
+        counter = 0;
+    }
+    else 
+    {
+        if(objectDetected)
+        {
+            Stop();   
+            Serial.println("stopping the motor!");
+        }
+        counter++;
+        if(counter > 3)
+        {
+            SetMotorSpeed(maxSpeed,maxSpeed);
+        }
+    }
     // if (targetLocation < -30 && targetLocation > -60) {
     //     SetMotorSpeed(80,80);
     // }else if (targetLocation > 60 && targetLocation < 90) {
@@ -32,12 +50,11 @@ void Motor::directMotors(int targetLocation, bool objectDetected) {
     // }else if (targetLocation == 9999 || objectDetected == true){
     //     Stop();
     // }  
-    delay(200);
 }
 
 void Motor::SetMotorSpeed(int speedL, int speedR) {
-    speedL = map(speedL, 0, 100, 0, 1024);
-    speedR = map(speedR, 0, 100, 0, 1024);
+    //speedL = map(speedL, 0, 100, 0, 1024);
+    //speedR = map(speedR, 0, 100, 0, 1024);
 
     ledcWrite(0, speedL); //IN1
     ledcWrite(1, 0); //IN2

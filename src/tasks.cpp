@@ -17,7 +17,7 @@ Camera openMV;
 TwoWire I2CdistanceSensor = TwoWire(0);
 
 bool objectDetected = false;
-bool start = false;
+bool motorEnabled = false;
 
 void processCmdRemoteDebug() {
 
@@ -34,11 +34,11 @@ void processCmdRemoteDebug() {
 
   	if (lastCmd == "start") {
       debugI("Starting driving"); 
-      start = true;
+      motorEnabled = true;
   }
   if (lastCmd == "stop") {
       debugI("Stop gaat fout kut");
-      start = false;
+      motorEnabled = false;
       motor.Stop();     
   }  
 }
@@ -66,7 +66,7 @@ void Tasks::readDistanceSensor(void * parameter)
     if(distance < 150)
     {
       objectDetected = true;
-      debugI("Object Detected");
+      debugE("Object Detected");
     }
     else {
       objectDetected = false;
@@ -82,10 +82,12 @@ void Tasks::cameraInput(void * parameter) {
 }
 
 void Tasks::motorDriver(void * parameter) {
-  for(;;) {
-    motor.directMotors(openMV.getObjectLocation(), objectDetected);
-  }
+  for(;;) 
+    {
+      motor.directMotors(openMV.getObjectLocation(), objectDetected);  
+    }
 }
+
 
 void Tasks::remoteDebugger(void * parameter) {
     if (MDNS.begin("AstontronDebug")) {

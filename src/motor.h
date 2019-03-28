@@ -3,7 +3,11 @@
 class Motor
 {
     public:
-        int minSpeed = 590;
+        int minSpeedR = 300;
+        int minSpeedL = 300;
+
+        int maxSpeed = 800;
+        int counter = 0;
 
         Motor()
         {
@@ -12,10 +16,10 @@ class Motor
             pinMode(25, OUTPUT); //IN3
             pinMode(26, OUTPUT); //IN4
             
-            ledcSetup(0,20000,10); //IN1
-            ledcSetup(1,20000,10); //IN2
-            ledcSetup(2,20000,10); //IN3
-            ledcSetup(3,20000,10); //IN4
+            ledcSetup(0,30000,10); //IN1
+            ledcSetup(1,30000,10); //IN2
+            ledcSetup(2,30000,10); //IN3
+            ledcSetup(3,30000,10); //IN4
 
             ledcAttachPin(22,0); //IN1
             ledcAttachPin(23,1); //IN2
