@@ -7,21 +7,15 @@ const char* ssid = "Astontron";
 const char* password = "Secret123";
 
 void connectWifi(){
-
  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Connection Failed! Rebooting...");
-    delay(5000);
-    ESP.restart();
-  }
-
+ WiFi.begin(ssid, password);
 }
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Booting");
   connectWifi();
+  delay(2000);
   disableCore0WDT();
   Tasks initTasks; 
 }

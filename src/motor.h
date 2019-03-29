@@ -3,11 +3,16 @@
 class Motor
 {
     public:
-        int minSpeedR = 300;
-        int minSpeedL = 300;
+        int minSpeedR = 650;
+        int minSpeedL = 700;
 
-        int maxSpeed = 800;
+        bool motorEnabled = false;
+        bool autoMode = true;
+
+        int maxSpeed = 800; //800
         int counter = 0;
+        int lastLocation = 0;
+
 
         Motor()
         {
@@ -21,14 +26,17 @@ class Motor
             ledcSetup(2,30000,10); //IN3
             ledcSetup(3,30000,10); //IN4
 
-            ledcAttachPin(22,0); //IN1
-            ledcAttachPin(23,1); //IN2
-            ledcAttachPin(25,2); //IN3
-            ledcAttachPin(26,3); //IN4
+            ledcAttachPin(22,1); //IN1
+            ledcAttachPin(23,0); //IN2
+            ledcAttachPin(25,3); //IN3
+            ledcAttachPin(26,2); //IN4
         }
 
         void directMotors(int targetLocation, bool objectDetected);
         void SetMotorSpeed(int speedL, int speedR);
         void Stop();
-
+        void backward();
+        void targetFound();
+        void getClearOfObject();
+        void turn();
 };
