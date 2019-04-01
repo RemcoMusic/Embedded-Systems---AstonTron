@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "RemoteDebug.h" 
 
 class Motor
 {
@@ -8,10 +9,15 @@ class Motor
 
         bool motorEnabled = false;
         bool autoMode = true;
+        bool started = false;
+        bool targetFound = false;
+        bool following = false;
 
         int maxSpeed = 800; //800
-        int counter = 0;
+        int TurnCounter = 0;
+        int Counter = 0;
         int lastLocation = 0;
+
 
 
         Motor()
@@ -36,7 +42,11 @@ class Motor
         void SetMotorSpeed(int speedL, int speedR);
         void Stop();
         void backward();
-        void targetFound();
+        void dance();
         void getClearOfObject();
         void turn();
+        void TurnToObject();
+        void forward();
+        void enable();
+        void disable();
 };

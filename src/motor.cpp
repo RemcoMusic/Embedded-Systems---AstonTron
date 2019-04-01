@@ -4,67 +4,71 @@
 
 void Motor::directMotors(int targetLocation, bool objectDetected) 
 {
-    if(autoMode && targetLocation < 176 && targetLocation > -176)
-    {
-        int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeedR);
-        int speedR = map(targetLocation ,-176, 176, minSpeedL, maxSpeed);
-
-        if(speedR < 40 && speedR > -40)
-        {
-            speedR = (maxSpeed - minSpeedR)/2 + minSpeedR; 
-        }
-        if(speedL < 40 && speedL > -40)
-        {
-            speedL = (maxSpeed - minSpeedL)/2 + minSpeedL; 
-        }
-
-        if(objectDetected)
+    if(started)
+    {  
+        if(objectDetected) //detect object
         {
             motorEnabled = false;
-            Stop();
-
+            if(targetLocation < 50 && targetLocation > -50)
+            {   
+                if(autoMode)
+                {    
+                    dance();
+                }    
+            }
+            else
+            {
+                if(autoMode)
+                {
+                    getClearOfObject();
+                }
+            } 
         }
         else
         {
             motorEnabled = true;
-        }
-        
-        if(targetLocation != 9999 && targetLocation != 0 && motorEnabled)
+        } 
+
+        if(autoMode && targetLocation < 176 && targetLocation > -176 && targetLocation != 0 && motorEnabled) //if target in sight
         {
+            following = true;
+            TurnCounter = 0;
+            Counter = 0;
+            
+            int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeedR); //map location to speed of motors
+            int speedR = map(targetLocation ,-176, 176, minSpeedL, maxSpeed);
+
+            // if(targetLocation < 10 && targetLocation > -10) //set deadband
+            // {
+
+            //     speedR = (maxSpeed - minSpeedR)/2 + minSpeedR; 
+            //     speedL = (maxSpeed - minSpeedL)/2 + minSpeedL; 
+            // }
+          
             lastLocation = targetLocation;
-            SetMotorSpeed(speedL, speedR); 
-            counter = 0;
+            SetMotorSpeed(speedL, speedR);                                
         }
         else
         {
-            if(targetLocation < 50 && targetLocation > -50 && !motorEnabled)
-            {       
-                targetFound();    
-            }
-            // else
-            // {
-            //     Stop();  
-            //     backward();
-            //     delay(1000);        
-            //     SetMotorSpeed(minSpeedL, 0); 
-            //     delay(1000);
-            //     SetMotorSpeed(minSpeedL, 0); 
-            //     SetMotorSpeed(0, minSpeedR); 
-            // }
-        
-            counter++;
-            if(counter > 3)
-            {
-                if (lastLocation > 0 && motorEnabled)
+            if(Counter > 5) //target lost
+            {        
+                if(TurnCounter < 5) //limit turn time
                 {
-                    SetMotorSpeed(0, minSpeedR); 
+                    TurnToObject();
+                    delay(200);
+                    TurnCounter++;
                 }
-                else if (lastLocation < 0 && motorEnabled)
-                {
-                    SetMotorSpeed(minSpeedL, 0); 
-                }
-            }
-        } 
+                else      //searchmode
+                {          
+                    int speedR = (maxSpeed - minSpeedR)/2 + minSpeedR; 
+                    int speedL = (maxSpeed - minSpeedL)/2 + minSpeedL;
+
+                    SetMotorSpeed(speedL, speedR);                                
+                } 
+            } 
+            Counter++; 
+            delay(50);                        
+        }  
     }
 }
 
@@ -84,6 +88,11 @@ void Motor::Stop() {
     ledcWrite(3, 0); //IN4
 }
 
+void Motor::forward()
+{
+    SetMotorSpeed(maxSpeed, maxSpeed); 
+}
+
 void Motor::backward()
 {
     ledcWrite(0, 0); //IN1
@@ -93,22 +102,14 @@ void Motor::backward()
     ledcWrite(3, minSpeedR); //IN4  
 }
 
-void Motor::targetFound()
+void Motor::dance()
 {
     ledcWrite(0, 0); //IN1
     ledcWrite(1, maxSpeed); //IN2
 
     ledcWrite(2, maxSpeed); //IN3
     ledcWrite(3, 0); //IN4  
-
-    delay(2000);
-
-    ledcWrite(0, 0); //IN1
-    ledcWrite(1, maxSpeed); //IN2
-
-    ledcWrite(2, 0); //IN3
-    ledcWrite(3, maxSpeed); //IN4  
-
+    delay(1000);
     Stop();
 }
 
@@ -121,12 +122,37 @@ void Motor::turn()
     ledcWrite(3, maxSpeed); //IN4  
 }
 
+void Motor::TurnToObject()
+{
+    if (lastLocation > 0 && motorEnabled)
+    {
+        SetMotorSpeed(0, minSpeedR); 
+    }
+    else if (lastLocation < 0 && motorEnabled)
+    {
+        SetMotorSpeed(minSpeedL, 0); 
+    }
+}
+
 void Motor::getClearOfObject()
 {
     autoMode = false;
     backward();
-    delay(1000);
+    delay(500);
+    Stop();
     turn();
+    delay(1000);
+    Stop();
+    forward();
+    autoMode = true;
+}
 
-    
+void Motor::enable()
+{
+    started = true;
+}
+
+void Motor::disable()
+{
+    started = false;
 }

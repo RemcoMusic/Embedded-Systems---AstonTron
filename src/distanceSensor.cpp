@@ -14,10 +14,15 @@ int DistanceSensor::readDistanceSensor()
 {
     int CurrentDistance = distanceSensor.readRangeSingleMillimeters(); 
   
-    if(CurrentDistance <= 1000)
+    if(CurrentDistance <= 1500)
     {
        return CurrentDistance;
     }
+    else
+    {
+        return 9999;
+    }
+    
 }
 
 int DistanceSensor::detectObjects()
