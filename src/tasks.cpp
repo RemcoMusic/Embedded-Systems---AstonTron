@@ -64,7 +64,7 @@ void Tasks::readDistanceSensor(void * parameter)
     int distance = dSensor.readDistanceSensor();
     debugI("Distance %u mm", distance);
     //Serial.println(distance);
-    if(distance < 50)
+    if(distance < 120)
     {
       objectDetected = true;
       debugE("Object Detected");
