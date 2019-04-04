@@ -28,11 +28,7 @@ void processCmdRemoteDebug() {
       OTAUpdate.startOTA();
   }
 
-	if (lastCmd == "test") {
-      debugI("Test succeeded /n ESP32 is working correctly");
-  }
-
-  	if (lastCmd == "start") {
+  if (lastCmd == "start") {
       debugI("Starting driving"); 
       motor.enable();
   }
@@ -62,7 +58,7 @@ void Tasks::readDistanceSensor(void * parameter)
   {
     debugV("Reading distance");
     int distance = dSensor.readDistanceSensor();
-    debugI("Distance %u mm", distance);
+    //debugI("Distance %u mm", distance);
     //Serial.println(distance);
     if(distance < 120)
     {

@@ -35,8 +35,8 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
             TurnCounter = 0;
             Counter = 0;
             
-            int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeedR); //map location to speed of motors
-            int speedR = map(targetLocation ,-176, 176, minSpeedL, maxSpeed);
+            int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeed); //map location to speed of motors
+            int speedR = map(targetLocation ,-176, 176, minSpeed, maxSpeed);
 
             // if(targetLocation < 10 && targetLocation > -10) //set deadband
             // {
@@ -60,8 +60,8 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
                 }
                 else  //searchmode
                 {          
-                    int speedR = (maxSpeed - minSpeedR)/2 + minSpeedR; 
-                    int speedL = (maxSpeed - minSpeedL)/2 + minSpeedL;
+                    int speedR = (maxSpeed - minSpeed)/2 + minSpeed; 
+                    int speedL = (maxSpeed - minSpeed)/2 + minSpeed;
 
                     SetMotorSpeed(speedL, speedR);                                
                 } 
@@ -96,10 +96,10 @@ void Motor::forward()
 void Motor::backward()
 {
     ledcWrite(0, 0); //IN1
-    ledcWrite(1, minSpeedL); //IN2
+    ledcWrite(1, minSpeed); //IN2
 
     ledcWrite(2, 0); //IN3
-    ledcWrite(3, minSpeedL); //IN4  
+    ledcWrite(3, minSpeed); //IN4  
 }
 
 void Motor::dance()
@@ -119,22 +119,22 @@ void Motor::dance()
 
 void Motor::turn()
 {
-    ledcWrite(0, minSpeedL); //IN1
+    ledcWrite(0, minSpeed); //IN1
     ledcWrite(1, 0); //IN2
 
     ledcWrite(2, 0); //IN3
-    ledcWrite(3, minSpeedL); //IN4  
+    ledcWrite(3, minSpeed); //IN4  
 }
 
 void Motor::TurnToObject()
 {
     if (lastLocation > 0 && motorEnabled)
     {
-        SetMotorSpeed(0, minSpeedR); 
+        SetMotorSpeed(0, minSpeed); 
     }
     else if (lastLocation < 0 && motorEnabled)
     {
-        SetMotorSpeed(minSpeedL, 0); 
+        SetMotorSpeed(minSpeed, 0); 
     }
 }
 

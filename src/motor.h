@@ -4,8 +4,7 @@
 class Motor
 {
     public:
-        int minSpeedR = 650;
-        int minSpeedL = 700;
+        int minSpeed = 700;
 
         bool motorEnabled = false;
         bool autoMode = true;
@@ -17,8 +16,6 @@ class Motor
         int TurnCounter = 0;
         int Counter = 0;
         int lastLocation = 0;
-
-
 
         Motor()
         {
