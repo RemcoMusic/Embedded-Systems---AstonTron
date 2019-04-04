@@ -6,59 +6,49 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
 {
     if(started)
     { 
-        if(objectDetected) //detect object
+        if(objectDetected)  //Detect if there is an object in front of the Robot
         {
             motorEnabled = false;
-            if(targetLocation < 100 && targetLocation > -100)
+            if(targetLocation < 100 && targetLocation > -100) //Detect of the object is the target object
             {   
                 if(autoMode)
                 {    
-                    dance();
+                    dance();    //Victory dance
                 }    
-            }
-            else
-            {
-                if(autoMode)
-                {
-                    getClearOfObject();
-                }
             } 
+            else if(autoMode) 
+            {
+                getClearOfObject(); //Get clear of the object in front of the robot
+            }
         }
         else
         {
             motorEnabled = true;
-        } 
+        }
 
-        if(autoMode && targetLocation < 176 && targetLocation > -176 && targetLocation != 0 && motorEnabled) //if target in sight
+        if(autoMode && targetLocation < 176 && targetLocation > -176 && targetLocation != 0 && motorEnabled) //If target is detected and target is in FOV
         {
             following = true;
             TurnCounter = 0;
             Counter = 0;
             
-            int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeed); //map location to speed of motors
+            int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeed); //Map the speed to the target location
             int speedR = map(targetLocation ,-176, 176, minSpeed, maxSpeed);
-
-            // if(targetLocation < 10 && targetLocation > -10) //set deadband
-            // {
-
-            //     speedR = (maxSpeed - minSpeedR)/2 + minSpeedR; 
-            //     speedL = (maxSpeed - minSpeedL)/2 + minSpeedL; 
-            // }
           
             lastLocation = targetLocation;
             SetMotorSpeed(speedL, speedR);                                
         }
         else
         {
-            if(Counter > 5) //target lost
+            if(Counter > 5) //If the target is lost within the FOV
             {        
-                if(TurnCounter < 5) //limit turn time
+                if(TurnCounter < 5) //How long the robot can turn to search for the target
                 {
                     TurnToObject();
                     delay(200);
                     TurnCounter++;
                 }
-                else  //searchmode
+                else  //Search mode for the robot
                 {          
                     int speedR = (maxSpeed - minSpeed)/2 + minSpeed; 
                     int speedL = (maxSpeed - minSpeed)/2 + minSpeed;
@@ -67,25 +57,25 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
                 } 
             } 
             Counter++; 
-            delay(50);                        
+            delay(50);  //TODO: Testen of dit nodig is                      
         }  
     }
 }
 
 void Motor::SetMotorSpeed(int speedL, int speedR) 
 {
-    ledcWrite(0, speedL); //IN1
-    ledcWrite(1, 0); //IN2
+    ledcWrite(0, speedL);
+    ledcWrite(1, 0);
 
-    ledcWrite(2, speedR); //IN3
-    ledcWrite(3, 0); //IN4
+    ledcWrite(2, speedR);
+    ledcWrite(3, 0);    
 }
 
 void Motor::Stop() {
-    ledcWrite(0, 0); //IN1
-    ledcWrite(1, 0); //IN2
-    ledcWrite(2, 0); //IN3
-    ledcWrite(3, 0); //IN4
+    ledcWrite(0, 0);
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
+    ledcWrite(3, 0);
 }
 
 void Motor::forward()
@@ -95,11 +85,20 @@ void Motor::forward()
 
 void Motor::backward()
 {
-    ledcWrite(0, 0); //IN1
-    ledcWrite(1, minSpeed); //IN2
+    ledcWrite(0, 0);
+    ledcWrite(1, minSpeed);
 
-    ledcWrite(2, 0); //IN3
-    ledcWrite(3, minSpeed); //IN4  
+    ledcWrite(2, 0);
+    ledcWrite(3, minSpeed);  
+}
+
+void Motor::turn()
+{
+    ledcWrite(0, minSpeed);
+    ledcWrite(1, 0);
+
+    ledcWrite(2, 0);
+    ledcWrite(3, minSpeed);
 }
 
 void Motor::dance()
@@ -108,27 +107,18 @@ void Motor::dance()
     backward();
     delay(200);
     Stop();
-    ledcWrite(0, 0); //IN1
-    ledcWrite(1, maxSpeed); //IN2
+    ledcWrite(0, 0);
+    ledcWrite(1, maxSpeed);
 
-    ledcWrite(2, maxSpeed); //IN3
-    ledcWrite(3, 0); //IN4  
+    ledcWrite(2, maxSpeed);
+    ledcWrite(3, 0); 
     delay(5000);
     Stop();
 }
 
-void Motor::turn()
-{
-    ledcWrite(0, minSpeed); //IN1
-    ledcWrite(1, 0); //IN2
-
-    ledcWrite(2, 0); //IN3
-    ledcWrite(3, minSpeed); //IN4  
-}
-
 void Motor::TurnToObject()
 {
-    if (lastLocation > 0 && motorEnabled)
+    if (lastLocation > 0 && motorEnabled) //Decides if the target left the FOV left or right
     {
         SetMotorSpeed(0, minSpeed); 
     }
