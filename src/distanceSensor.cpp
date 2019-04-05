@@ -24,17 +24,3 @@ int DistanceSensor::readDistanceSensor()
     }
     
 }
-
-int DistanceSensor::detectObjects()
-{
-    int correctedDistance = readDistanceSensor();
-
-    if(correctedDistance != 0)
-    {
-        return 1;
-    }
-    else 
-    {
-        return 0;
-    }
-}

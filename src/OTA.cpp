@@ -4,16 +4,20 @@
 
 void OTA::startOTA()
 {
-      ArduinoOTA.setHostname("AstontronOTA");
+  ArduinoOTA.setHostname("AstontronOTA");
       
-      ArduinoOTA
-      .onStart([]() {
-        String type;
-        if (ArduinoOTA.getCommand() == U_FLASH)
-          type = "sketch";
-        else
-          type = "filesystem";
-      });
+    ArduinoOTA.onStart([]() 
+    {
+      String type;
+      if (ArduinoOTA.getCommand() == U_FLASH)
+      {
+        type = "sketch";
+      }
+      else
+      {
+        type = "filesystem";
+      }
+    });
 
     ArduinoOTA.begin();
     while(true)

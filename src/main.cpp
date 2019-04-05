@@ -6,12 +6,14 @@
 const char* ssid = "Astontron";
 const char* password = "Secret123";
 
-void connectWifi(){
- WiFi.mode(WIFI_STA);
- WiFi.begin(ssid, password);
+void connectWifi()
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
 }
 
-void setup() {
+void setup() 
+{
   Serial.begin(115200);
   Serial.println("Booting");
   connectWifi();
@@ -20,6 +22,7 @@ void setup() {
   Tasks initTasks; 
 }
 
-void loop() {
+void loop() 
+{
   delay(500);
 }

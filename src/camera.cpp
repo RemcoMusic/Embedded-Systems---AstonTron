@@ -1,49 +1,50 @@
 #include <Arduino.h>
 #include "camera.h"
 
-HardwareSerial mySerial(2);
+HardwareSerial serialComsCamera(2);
 
-int MAX_CMD_LENGTH = 10;
-char cmd[10];
-int cmdIndex;
-char incomingByte;
-
-void Camera::beginSetup()
+void Camera::beginSetup()   //Open the connection to communicate with the camera through the UART protocol
 {
-    mySerial.begin(115200,SERIAL_8N1,17,16);
+    serialComsCamera.begin(115200,SERIAL_8N1,17,16);
     cmdIndex = 0;
-    mySerial.write("Begin \n");
+    serialComsCamera.write("Begin \n"); //Send first message for comfirmation communication
 }
 
-void Camera::readCamera()
+void Camera::readCamera()   //Read the incoming bytes until \n and convert them to an int
 {
-    if (incomingByte=mySerial.available()>0) {
-        
-        char byteIn = mySerial.read();
+    if((incomingByte=serialComsCamera.available()>0)) 
+    { 
+        char byteIn = serialComsCamera.read();
         cmd[cmdIndex] = byteIn;
         
-        if(byteIn=='\n') {
+        if(byteIn=='\n') 
+        {
             cmd[cmdIndex] = '\0';
             cmdIndex = 0;
             
-            if(cmd != 0) {
-                mySerial.write('Yes' + '\n');
+            if(cmd != 0) 
+            {
+                serialComsCamera.write("Yes \n");
             }
             int i = atoi(cmd);
-            Serial.println(i); //print camera output
             setObjectLocation(i);
-        }else{
-            if(cmdIndex++ >= MAX_CMD_LENGTH){
-            cmdIndex = 0;
+        }
+        else
+        {
+            if(cmdIndex++ >= MAX_CMD_LENGTH)
+            {
+                cmdIndex = 0;
             }
         }
     }
 }
 
-void Camera::setObjectLocation(int x) {
+void Camera::setObjectLocation(int x) 
+{
     objectLocation = x;
 }
 
-int Camera::getObjectLocation() {
+int Camera::getObjectLocation() 
+{
     return objectLocation;
 }

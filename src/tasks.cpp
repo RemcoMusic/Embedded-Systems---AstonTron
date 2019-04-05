@@ -19,21 +19,22 @@ TwoWire I2CdistanceSensor = TwoWire(0);
 bool objectDetected = false;
 bool motorDriverEnabled = false;
 
-void processCmdRemoteDebug() {
+void processCmdRemoteDebug() 
+{
 
 	String lastCmd = Debug.getLastCommand();
 
 	if (lastCmd == "ota") {
-      debugI("ota starting");
+      debugI("Over the Air updating has been started");
       OTAUpdate.startOTA();
   }
 
   if (lastCmd == "start") {
-      debugI("Starting driving"); 
+      debugI("Started searching for target"); 
       motor.enable();
   }
   if (lastCmd == "stop") {
-      debugI("Stop gaat fout kut");
+      debugI("Stop searching for target");
       motor.disable();    
       motor.Stop();
   }  
@@ -56,8 +57,7 @@ void Tasks::readDistanceSensor(void * parameter)
   dSensor.beginSetup();
   for(;;)
   {
-    int distance = dSensor.readDistanceSensor();
-    if(distance < 120)
+    if(dSensor.readDistanceSensor() < 120)
     {
       objectDetected = true;
       debugE("Object Detected");
@@ -68,32 +68,29 @@ void Tasks::readDistanceSensor(void * parameter)
     delay(50);
   }
 }
-void Tasks::cameraInput(void * parameter) {
+
+void Tasks::cameraInput(void * parameter) 
+{
   openMV.beginSetup();
   for(;;) {
     openMV.readCamera();
   }
 }
 
-void Tasks::motorDriver(void * parameter) {
+void Tasks::motorDriver(void * parameter) 
+{
   for(;;) 
     {
       motor.directMotors(openMV.getObjectLocation(), objectDetected);  
     }
 }
 
-void Tasks::remoteDebugger(void * parameter) {
-    if (MDNS.begin("AstontronDebug")) {
-        Serial.print("* MDNS responder started. Hostname -> ");
-        Serial.println("AstontronDebug");
-    }
-
-    MDNS.addService("telnet", "tcp", 23);
-
-    Debug.begin("AstontronDebug"); // Initiaze the telnet server
+void Tasks::remoteDebugger(void * parameter) 
+{
+    Debug.begin("AstontronDebug");  // Initiaze the telnet server
     Debug.setResetCmdEnabled(true); // Enable the reset command
-	  Debug.showProfiler(false); // Profiler (Good to measure times, to optimize codes)
-	  Debug.showColors(true); // Colors
+	  Debug.showProfiler(false);  // Profiler measures times
+	  Debug.showColors(true); // Colors inthe console
     Debug.setCallBackProjectCmds(&processCmdRemoteDebug);
 
     xTaskCreate(

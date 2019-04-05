@@ -3,11 +3,11 @@
 
 class DistanceSensor
 {
-    public:
-        void beginSetup();
-        int readDistanceSensor();
-        int detectObjects();
-
+    private:
         VL53L0X distanceSensor;
         float SignalRate = 0.25;
+
+    public:
+        void beginSetup();
+        int readDistanceSensor();  
 };
