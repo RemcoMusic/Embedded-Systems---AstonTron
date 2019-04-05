@@ -41,6 +41,10 @@ class Motor
         int Counter = 0;
         int lastLocation = 0;
 
+        unsigned long startMillis;  //some global variables available anywhere in the program
+        unsigned long currentMillis;
+        const unsigned long period = 2000;  //the value is a number of milliseconds
+
         void SetMotorSpeed(int speedL, int speedR);
         void backward();
         void dance();

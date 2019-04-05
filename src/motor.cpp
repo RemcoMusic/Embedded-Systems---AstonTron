@@ -151,11 +151,25 @@ void Motor::TurnToObject()
 
 void Motor::getClearOfObject()
 {
+    uint32_t period = 500L;
+
     autoMode = false;
-    backward();
-    delay(500);
-    turn();
-    delay(random(300, 600));
+    for(uint32_t tStart = millis();  (millis()-tStart) < period;)
+    {
+        backward();
+        autoMode = true;
+        delay(100);
+        autoMode = false;
+    }
+    uint32_t period2 = random(300L,600L);
+
+    for(uint32_t tStart2 = millis();  (millis()-tStart2) < period2;)
+    {
+        turn();
+        autoMode = true;
+        delay(100);
+        autoMode = false;
+    }
     forward();
     autoMode = true;
 }
