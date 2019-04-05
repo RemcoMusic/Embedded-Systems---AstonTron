@@ -57,12 +57,8 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
                 } 
             } 
             Counter++; 
-            delay(50);  //delay for target counter                   
+            delay(50);  //Delay for target counter                   
         }  
-    }
-    else
-    {
-        Stop(); //if motor is not started, Stop
     }
 }
 
@@ -98,8 +94,8 @@ void Motor::backward()
 
 void Motor::turn()
 {
-    int direction(random(0,2)); //random value 0 or 1
-    if(direction == 0) //turn right
+    int direction(random(0,2)); //Random value 0 or 1
+    if(direction == 0) //Turn right
     {
         ledcWrite(0, 0);
         ledcWrite(1, minSpeed);
@@ -107,7 +103,7 @@ void Motor::turn()
         ledcWrite(2, minSpeed);
         ledcWrite(3, 0);
     }
-    else //turn left
+    else //Turn left
     {
         ledcWrite(0, minSpeed);
         ledcWrite(1, 0);
@@ -119,19 +115,26 @@ void Motor::turn()
 
 void Motor::dance()
 {
-    started = false;
+    disable();
     backward();
     delay(200);
     Stop();
+
+    for(int i = 0; i < 10;i++)
+    {
     ledcWrite(0, 0);
-    ledcWrite(1, maxSpeed);
-    
-    ledcWrite(2, maxSpeed);
+    ledcWrite(1, random(950,1024));
+    ledcWrite(2, random(950,1024));
     ledcWrite(3, 0); 
-    delay(5000);
+    delay(random(50,200));
+    ledcWrite(0, random(950,1024));
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
+    ledcWrite(3, random(950,1024)); 
+    delay(random(50,200));
+    }
     Stop();
     delay(3000);
-    started = true; //search
 }
 
 void Motor::TurnToObject()

@@ -60,7 +60,7 @@ void Tasks::readDistanceSensor(void * parameter)
     if(dSensor.readDistanceSensor() < 140)
     {
       objectDetected = true;
-      debugE("Object Detected");
+      debugE("Object detected closer than 140 Millimeter");
     }
     else {
       objectDetected = false;
