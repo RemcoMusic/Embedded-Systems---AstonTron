@@ -57,7 +57,7 @@ void Tasks::readDistanceSensor(void * parameter)
   dSensor.beginSetup();
   for(;;)
   {
-    if(dSensor.readDistanceSensor() < 120)
+    if(dSensor.readDistanceSensor() < 140)
     {
       objectDetected = true;
       debugE("Object Detected");

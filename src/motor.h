@@ -28,15 +28,15 @@ class Motor
         void Stop();
 
     private:
-        int minSpeed = 700;
-
-        bool motorEnabled = false;
+        
         bool autoMode = true;
+        bool motorEnabled = false;
         bool started = false;
         bool targetFound = false;
         bool following = false;
 
-        int maxSpeed = 800; 
+        int minSpeed = 700;
+        int maxSpeed = 900; 
         int TurnCounter = 0;
         int Counter = 0;
         int lastLocation = 0;
