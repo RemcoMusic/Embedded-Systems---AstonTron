@@ -8,6 +8,7 @@ void Camera::beginSetup()   //Open the connection to communicate with the camera
     serialComsCamera.begin(115200,SERIAL_8N1,17,16);
     cmdIndex = 0;
     serialComsCamera.write("Begin \n"); //Send first message for comfirmation communication
+    setObjectLocation(9999);
 }
 
 void Camera::readCamera()   //Read the incoming bytes until \n and convert them to an int
