@@ -123,12 +123,20 @@ void Motor::dance()
     backward();
     delay(200);
     Stop();
+
+    for(int i; i < 10;i++)
+    {
     ledcWrite(0, 0);
-    ledcWrite(1, maxSpeed);
-    
-    ledcWrite(2, maxSpeed);
+    ledcWrite(1, random(950,1024));
+    ledcWrite(2, random(950,1024));
     ledcWrite(3, 0); 
-    delay(5000);
+    delay(random(50,200));
+    ledcWrite(0, random(950,1024));
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
+    ledcWrite(3, random(950,1024)); 
+    delay(random(50,200));
+    }
     Stop();
     delay(3000);
     started = true; //search

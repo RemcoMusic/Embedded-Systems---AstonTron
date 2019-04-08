@@ -7,14 +7,18 @@
 #include "camera.h"
 #include "distanceSensor.h"
 #include "tasks.h"
+#include "IR.h"
 
 RemoteDebug Debug;
 OTA OTAUpdate;
 Motor motor;
 DistanceSensor dSensor;
 Camera openMV;
+IR IRreciever;
 
 TwoWire I2CdistanceSensor = TwoWire(0);
+
+unsigned long oldIRinput = 0;
 
 bool objectDetected = false;
 bool motorDriverEnabled = false;
@@ -85,6 +89,32 @@ void Tasks::motorDriver(void * parameter)
     }
 }
 
+void Tasks::IRdecoder(void * parameter)
+{
+  IRreciever.start();
+  delay(500);
+  for(;;)
+  {
+    unsigned long newIRinput = IRreciever.Recieve();
+
+    if(newIRinput != oldIRinput)
+    {
+      oldIRinput = newIRinput;
+      if(newIRinput != 1073482616)
+      {
+        Serial.println(newIRinput);
+
+        //functions
+      }
+      IRreciever.Next();
+    }
+    else
+    {
+      delay(500);
+    }
+  }
+}
+
 void Tasks::remoteDebugger(void * parameter) 
 {
     Debug.begin("AstontronDebug");  // Initiaze the telnet server
@@ -112,6 +142,14 @@ void Tasks::remoteDebugger(void * parameter)
     xTaskCreate(
       motorDriver,
       "Motor",
+      10000,
+      NULL,
+      1,
+      NULL);
+
+    xTaskCreate(
+      IRdecoder,
+      "IRdecoder",
       10000,
       NULL,
       1,
