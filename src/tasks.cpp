@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include "RemoteDebug.h" 
 #include "OTA.h"
-#include "motor.h"
+#include "motor2.h"
 #include "camera.h"
 #include "distanceSensor.h"
 #include "tasks.h"
@@ -31,6 +31,7 @@ void processCmdRemoteDebug()
 
   if (lastCmd == "start") {
       debugI("Started searching for target"); 
+      motor.forward();
       motor.enable();
   }
   if (lastCmd == "stop") {
@@ -79,6 +80,7 @@ void Tasks::cameraInput(void * parameter)
 
 void Tasks::motorDriver(void * parameter) 
 {
+  motor.startTimer();
   for(;;) 
     {
       motor.directMotors(openMV.getObjectLocation(), objectDetected);  
