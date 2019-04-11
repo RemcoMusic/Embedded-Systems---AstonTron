@@ -7,12 +7,9 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
 {
     if(started)
     {
-        if(!counterActive)
-        {
-            currentMillis = millis();  //get the current "time"
-            counterActive = true;
-        }
-
+     
+        currentMillis = millis();  //get the current "time"
+   
         if((targetLocation < 176) && (targetLocation > -176) && (targetLocation != 0))
         {
             targetInSight = true;
@@ -24,7 +21,7 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
 
         if(targetInSight)
         {
-            if(objectDetected)
+            if(objectDetected && (targetLocation < 100) && (targetLocation > -100) && (targetLocation != 0))
             {
                 dance();
             }
@@ -33,27 +30,36 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
                 int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeed); //Map the speed to the target location
                 int speedR = map(targetLocation ,-176, 176, minSpeed, maxSpeed);
 
-                lastLocation = targetLocation;
-                startMillis = currentMillis;  //reset millis counter 
-                counterActive = false;     
+                lastLocation = targetLocation; //set last location to determine turn direction
+
+                resetCounter();   
+
+                getClearOfObjectActive = false;
+                turnDisabled = false;
 
                 SetMotorSpeed(speedL, speedR);   
             }
         }
-        else if (!targetInSight)
-        {  
-            if(objectDetected)
+        else
+        {
+            if(!objectDetected)
             {
-                turn();
-            }
-            else if (currentMillis - startMillis <= 4000 && !objectDetected)  //test whether the period has elapsed
-                { 
-                    TurnToObject();
-                }
-                else
+                if((currentMillis - startMillis > 2500))
                 {
                     forward();
                 }
+                else if (!turnDisabled)
+                {
+                    TurnToObject();
+                }        
+            }
+            else
+            {
+                if(!getClearOfObjectActive)
+                {
+                    getClearOfObject();
+                }      
+            }
         }
     }
 }
@@ -123,22 +129,22 @@ void Motor::dance()
     for(int i = 0; i < 10;i++)
     {
     ledcWrite(0, 0);
-    ledcWrite(1, random(950,1024));
-    ledcWrite(2, random(950,1024));
+    ledcWrite(1, random(900,1024));
+    ledcWrite(2, random(900,1024));
     ledcWrite(3, 0); 
     delay(random(50,200));
-    ledcWrite(0, random(950,1024));
+    ledcWrite(0, random(900,1024));
     ledcWrite(1, 0);
     ledcWrite(2, 0);
-    ledcWrite(3, random(950,1024)); 
+    ledcWrite(3, random(900,1024)); 
     delay(random(50,200));
     }
     Stop();
-    delay(3000);
 }
 
 void Motor::TurnToObject()
 {
+    turnDisabled = true;
     if (lastLocation > 0 && motorEnabled) //Decides if the target left the FOV left or right
     {
         turn(0);
@@ -151,34 +157,36 @@ void Motor::TurnToObject()
 
 void Motor::getClearOfObject()
 {
-    // uint32_t period = 500L;
+    getClearOfObjectActive = true;
 
-    // backward();
-
-    // autoMode = false;
-    // for(uint32_t tStart = millis();  (millis()-tStart) < period;)
-    // {
-    //     autoMode = true;
-    //     delay(100);
-    //     autoMode = false;
-    // }
-    // uint32_t period2 = random(600L,1200L);
-
-    // turn(random(0,2));
-
-    // for(uint32_t tStart2 = millis();  (millis()-tStart2) < period2;)
-    // {
-    //     autoMode = true;
-    //     delay(100);
-    //     autoMode = false;
-    // }
-    // forward();
-    // autoMode = true;
     backward();
-    delay(500);
-    turn(random(0,2));
-    delay(random(300,1500));
-    forward();   
+    delay(random(400,600));
+    turn(random(0,2)); 	
+
+    int currentCounterTime = millis();
+    int counterStart = millis();
+
+    int turntime = random(300, 600);
+
+
+    while(currentCounterTime - counterStart < turntime)
+    {   
+        if(!targetFound)
+        {
+            currentCounterTime = millis();
+        }
+        else
+        {
+            forward();
+            resetCounter();
+            getClearOfObjectActive = false;
+            break;
+        }   
+    }
+
+    forward();
+    resetCounter();
+    getClearOfObjectActive = false;
 }
 
 void Motor::enable()
@@ -189,4 +197,9 @@ void Motor::enable()
 void Motor::disable()
 {
     started = false;
+}
+
+void Motor::resetCounter()
+{
+    startMillis = currentMillis;  //reset millis counter 
 }

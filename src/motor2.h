@@ -29,23 +29,25 @@ class Motor
         void Stop();
         void forward();
 
+        int minSpeed = 650;
+        int maxSpeed = 750; //800
+
     private:
 
         unsigned long startMillis;  //some global variables available anywhere in the program
         unsigned long currentMillis;
         const unsigned long period = 1000;  //the value is a number of milliseconds
         bool targetInSight = false;
-        bool counterActive = false;
 
-
+        bool getClearOfObjectActive = false;
         bool autoMode = true;
         bool motorEnabled = false;
         bool started = false;
         bool targetFound = false;
         bool following = false;
+        bool turnDisabled = false;
 
-        int minSpeed = 650;
-        int maxSpeed = 900; 
+
         int TurnCounter = 0;
         int Counter = 0;
         int lastLocation = 0;
@@ -56,4 +58,5 @@ class Motor
         void getClearOfObject();
         void turn(int direction);
         void TurnToObject();
+        void resetCounter();
 };
