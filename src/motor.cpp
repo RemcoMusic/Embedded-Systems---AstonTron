@@ -1,14 +1,11 @@
 #include <Arduino.h>
-#include <Wire.h>
-#include "motor2.h"
+#include "motor.h"
  
-
 void Motor::directMotors(int targetLocation, bool objectDetected) 
 {
     if(started)
     {
-     
-        currentMillis = millis();  //get the current "time"
+        currentMillis = millis();  //Get the current millis
    
         if((targetLocation < 176) && (targetLocation > -176) && (targetLocation != 0))
         {
@@ -30,19 +27,19 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
                 int speedL = map(targetLocation ,-176, 176, maxSpeed, minSpeed); //Map the speed to the target location
                 int speedR = map(targetLocation ,-176, 176, minSpeed, maxSpeed);
 
-                lastLocation = targetLocation; //set last location to determine turn direction
+                lastLocation = targetLocation; //Set last location to determine turn direction
 
                 resetCounter();   
 
-                getClearOfObjectActive = false;
                 turnDisabled = false;
+                getClearOfObjectActive = false;
 
                 SetMotorSpeed(speedL, speedR);   
             }
         }
         else
         {
-            if(!objectDetected)
+            if(!objectDetected && !getClearOfObjectActive)
             {
                 if((currentMillis - startMillis > 2500))
                 {
@@ -54,11 +51,8 @@ void Motor::directMotors(int targetLocation, bool objectDetected)
                 }        
             }
             else
-            {
-                if(!getClearOfObjectActive)
-                {
-                    getClearOfObject();
-                }      
+            {              
+                getClearOfObject();         
             }
         }
     }
@@ -157,36 +151,24 @@ void Motor::TurnToObject()
 
 void Motor::getClearOfObject()
 {
-    getClearOfObjectActive = true;
-
-    backward();
-    delay(random(400,600));
-    turn(random(0,2)); 	
-
-    int currentCounterTime = millis();
-    int counterStart = millis();
-
-    int turntime = random(300, 600);
-
-
-    while(currentCounterTime - counterStart < turntime)
-    {   
-        if(!targetFound)
-        {
-            currentCounterTime = millis();
-        }
-        else
-        {
-            forward();
-            resetCounter();
-            getClearOfObjectActive = false;
-            break;
-        }   
+    if(!getClearOfObjectActive)
+    {
+        backward();
+        delay(random(400,600));
+        turn(random(0,2)); 
+        counterStart = millis();
+        turntime = random(400, 1000);
+        getClearOfObjectActive = true;
     }
 
-    forward();
-    resetCounter();
-    getClearOfObjectActive = false;
+    currentCounterTime = millis();
+
+    if(currentCounterTime - counterStart > turntime)
+    {
+        forward();
+        resetCounter();
+        getClearOfObjectActive = false;      
+    }
 }
 
 void Motor::enable()
@@ -201,5 +183,5 @@ void Motor::disable()
 
 void Motor::resetCounter()
 {
-    startMillis = currentMillis;  //reset millis counter 
+    startMillis = currentMillis;  //Reset millis counter 
 }

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "RemoteDebug.h" 
 
 class Motor
 {
@@ -22,34 +21,39 @@ class Motor
             ledcAttachPin(26,2); //Motor IN4
         }
 
+        void startTimer();
         void directMotors(int targetLocation, bool objectDetected);
         void enable();
         void disable();
         void Stop();
-
-    private:
-        
-        bool autoMode = true;
-        bool motorEnabled = false;
-        bool started = false;
-        bool targetFound = false;
-        bool following = false;
+        void forward();
 
         int minSpeed = 650;
-        int maxSpeed = 900; 
-        int TurnCounter = 0;
-        int Counter = 0;
-        int lastLocation = 0;
+        int maxSpeed = 750; //800
+
+    private:
 
         unsigned long startMillis;  //some global variables available anywhere in the program
         unsigned long currentMillis;
-        const unsigned long period = 2000;  //the value is a number of milliseconds
+        const unsigned long period = 1000;  //the value is a number of milliseconds
+        bool targetInSight = false;
+        bool getClearOfObjectActive = false;
+        bool motorEnabled = false;
+        bool started = false;
+        bool targetFound = false;
+        bool turnDisabled = true;
+        int TurnCounter = 0;
+        int lastLocation = 0;
+
+        int counterStart = 0;
+        int currentCounterTime = 0;
+        int turntime = 0;
 
         void SetMotorSpeed(int speedL, int speedR);
         void backward();
         void dance();
         void getClearOfObject();
-        void turn();
+        void turn(int direction);
         void TurnToObject();
-        void forward();
+        void resetCounter();
 };
