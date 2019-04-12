@@ -19,6 +19,8 @@ TwoWire I2CdistanceSensor = TwoWire(0);
 bool objectDetected = false;
 bool motorDriverEnabled = false;
 
+int distanceTreshold = 130;
+
 void processCmdRemoteDebug() 
 {
 
@@ -31,6 +33,7 @@ void processCmdRemoteDebug()
 
   if (lastCmd == "start") {
       debugI("Started searching for target"); 
+      motor.forward();
       motor.enable();
   }
   if (lastCmd == "stop") {
@@ -38,6 +41,18 @@ void processCmdRemoteDebug()
       motor.disable();    
       motor.Stop();
   }  
+  if(lastCmd == "turbo") {
+    motor.maxSpeed = 1024;
+    motor.minSpeed = 750;
+    distanceTreshold = 200;
+  }
+
+  if(lastCmd == "disTurbo") {
+    motor.maxSpeed = 750;
+    motor.minSpeed = 650;
+    distanceTreshold = 130;
+  }
+
 }
 
 Tasks::Tasks()
@@ -57,10 +72,10 @@ void Tasks::readDistanceSensor(void * parameter)
   dSensor.beginSetup();
   for(;;)
   {
-    if(dSensor.readDistanceSensor() < 140)
+    if(dSensor.readDistanceSensor() < distanceTreshold)
     {
       objectDetected = true;
-      debugE("Object detected closer than 140 Millimeter");
+      debugV("Object detected closer than 130 Millimeter");
     }
     else {
       objectDetected = false;
@@ -79,6 +94,7 @@ void Tasks::cameraInput(void * parameter)
 
 void Tasks::motorDriver(void * parameter) 
 {
+  motor.startTimer();
   for(;;) 
     {
       motor.directMotors(openMV.getObjectLocation(), objectDetected);  
