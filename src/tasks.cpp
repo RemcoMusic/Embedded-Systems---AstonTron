@@ -7,12 +7,14 @@
 #include "camera.h"
 #include "distanceSensor.h"
 #include "tasks.h"
+#include "nec.h"
 
 RemoteDebug Debug;
 OTA OTAUpdate;
 Motor motor;
 DistanceSensor dSensor;
 Camera openMV;
+NEC IRDecoder;
 
 TwoWire I2CdistanceSensor = TwoWire(0);
 
@@ -84,6 +86,43 @@ void Tasks::readDistanceSensor(void * parameter)
   }
 }
 
+void Tasks::IRdecoder(void * parameter) 
+{
+  IRDecoder.getSingleton();
+  uint16_t lastCommand = 5;
+  bool switchTurbo = false;
+  for(;;) 
+  {
+    IRDecoder.loop(1);
+    uint16_t receivedCommand = IRDecoder.getCommand();
+
+    if (receivedCommand != 0 && (receivedCommand != lastCommand))
+    {
+      lastCommand = receivedCommand;
+      debugI("Received Command: %u" , receivedCommand);
+      if(receivedCommand == 47685)
+      {
+        motor.forward();
+        motor.enable();
+      } else if(receivedCommand == 47175) 
+        {
+          motor.disable();    
+          motor.Stop();
+        } else if(receivedCommand == 59670) 
+          {
+            motor.maxSpeed = 1024;
+            motor.minSpeed = 750;
+            distanceTreshold = 200;
+            } else if(receivedCommand == 61965)
+              {
+                motor.maxSpeed = 750;
+                motor.minSpeed = 650;
+                distanceTreshold = 130;
+              }
+    }
+  }
+}
+
 void Tasks::cameraInput(void * parameter) 
 {
   openMV.beginSetup();
@@ -113,6 +152,14 @@ void Tasks::remoteDebugger(void * parameter)
     xTaskCreate(
       readDistanceSensor,
       "Read_Distance_Sensor",
+      10000,
+      NULL,
+      1,
+      NULL);
+    
+    xTaskCreate(
+      IRdecoder,
+      "IR_Decoder",
       10000,
       NULL,
       1,
